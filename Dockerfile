@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:8.4-apache
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
@@ -20,25 +20,36 @@ RUN apt-get update && \
         libjpeg62-turbo-dev \
         libfreetype6-dev \
         libpng-dev \
+        libwebp-dev \
         libssl-dev \
         libonig-dev \
         libzip-dev \
         zip
 
 RUN docker-php-ext-install mbstring
-
 RUN docker-php-ext-install zip
-
 RUN docker-php-ext-install xml
-
 RUN docker-php-ext-install iconv
+RUN docker-php-ext-install pcntl
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install gd
 
 RUN docker-php-ext-install pdo pdo_mysql
+
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    make \
+    libc-dev \
+    && pecl install redis \
+    && docker-php-ext-enable redis
     
 RUN pecl install mongodb \
     && docker-php-ext-enable mongodb
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN composer global require laravel/installer
+RUN echo 'export PATH="$PATH:$HOME/.composer/vendor/bin"' | tee -a ~/.bashrc
+RUN . ~/.bashrc
