@@ -11,7 +11,7 @@ RUN a2enmod rewrite
 
 RUN docker-php-ext-install mysqli
 
-RUN apt-get update -y && apt-get install -y sendmail libpng-dev
+RUN apt-get update -y && apt-get install -y sendmail libpng-dev curl
 
 RUN apt-get update && \
     apt-get install -y \
@@ -53,3 +53,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN composer global require laravel/installer
 RUN echo 'export PATH="$PATH:$HOME/.composer/vendor/bin"' | tee -a ~/.bashrc
 RUN . ~/.bashrc
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
