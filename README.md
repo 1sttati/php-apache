@@ -103,3 +103,7 @@ docker run -v $(pwd):/var/www/html -p 8080:80 your-image
 ## License
 
 This Dockerfile configuration is open source and available for use.
+
+## About This Repository
+
+This repository has been enhanced to demonstrate [agent capabilities](AGENT_CAPABILITIES.md). See the capabilities document to understand what improvements were made and what the GitHub Copilot Agent can do.
