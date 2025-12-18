@@ -18,6 +18,7 @@ RUN set -eux; \
         libxml2-dev \
         libjpeg62-turbo-dev \
         libfreetype6-dev \
+        libgpgme-dev \
         libpng-dev \
         libwebp-dev \
         libssl-dev \
@@ -37,6 +38,8 @@ RUN docker-php-ext-install gd
 
 RUN docker-php-ext-install pdo pdo_mysql
 
+RUN pecl install gnupg  \
+    && docker-php-ext-enable gnupg
 
 RUN pecl install redis \
     && docker-php-ext-enable redis
