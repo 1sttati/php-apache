@@ -9,12 +9,11 @@ RUN chown -R www-data:www-data /var/www/html
 
 RUN a2enmod rewrite
 
-RUN docker-php-ext-install mysqli
-
-RUN apt-get update -y && apt-get install -y sendmail libpng-dev
-
-RUN apt-get update && \
-    apt-get install -y \
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        sendmail \
+        gnupg \
         zlib1g-dev \
         libxml2-dev \
         libjpeg62-turbo-dev \
@@ -24,13 +23,14 @@ RUN apt-get update && \
         libssl-dev \
         libonig-dev \
         libzip-dev \
-        zip
+        zip \
+        gcc \
+        make \
+        libc-dev \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-install mbstring
-RUN docker-php-ext-install zip
-RUN docker-php-ext-install xml
-RUN docker-php-ext-install iconv
-RUN docker-php-ext-install pcntl
+RUN docker-php-ext-install mysqli mbstring zip xml iconv pcntl
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp
 RUN docker-php-ext-install gd
@@ -38,11 +38,7 @@ RUN docker-php-ext-install gd
 RUN docker-php-ext-install pdo pdo_mysql
 
 
-RUN apt-get update && apt-get install -y \
-    gcc \
-    make \
-    libc-dev \
-    && pecl install redis \
+RUN pecl install redis \
     && docker-php-ext-enable redis
     
 RUN pecl install mongodb \
