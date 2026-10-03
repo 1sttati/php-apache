@@ -14,6 +14,9 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends \
         sendmail \
         gnupg \
+        curl \
+        iputils-ping \
+        nano \
         zlib1g-dev \
         libxml2-dev \
         libjpeg62-turbo-dev \
@@ -44,8 +47,13 @@ RUN pecl install gnupg  \
 RUN pecl install redis \
     && docker-php-ext-enable redis
     
-RUN pecl install mongodb \
-    && docker-php-ext-enable mongodb
+# pecl's REST client crashes on PHP 8.4 when fetching mongodb (fread() float length),
+# so download the latest release tarball and install it from the local file
+RUN v=$(curl -fsSL https://pecl.php.net/rest/r/mongodb/latest.txt) \
+    && curl -fsSL -o /tmp/mongodb.tgz https://pecl.php.net/get/mongodb-$v.tgz \
+    && pecl install /tmp/mongodb.tgz \
+    && docker-php-ext-enable mongodb \
+    && rm /tmp/mongodb.tgz
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
